@@ -1,5 +1,9 @@
 # Porkbun CLI
 
+![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Status: Active](https://img.shields.io/badge/status-active-success.svg)
+
 A command-line interface for managing domains and DNS records through the [Porkbun API](https://porkbun.com/api/json/v3/documentation).
 
 ## Features
@@ -126,6 +130,5 @@ MIT License - see [LICENSE](LICENSE) file
 
 **Luke Steuber**
 
-- Website: [lukesteuber.com](https://lukesteuber.com)
-- GitHub: [@lukeslp](https://github.com/lukeslp)
-- Bluesky: [@lukesteuber.com](https://bsky.app/profile/lukesteuber.com)
+- Website: [dr.eamer.dev](https://dr.eamer.dev)
+- Bluesky: [@dr.eamer.dev](https://bsky.app/profile/dr.eamer.dev)
