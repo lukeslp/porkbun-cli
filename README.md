@@ -1,7 +1,7 @@
 # porkbun-cli
 
 ![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)
-![PyPI](https://img.shields.io/pypi/v/porkbun-cli.svg)
+[![PyPI](https://img.shields.io/pypi/v/porkbun.svg)](https://pypi.org/project/porkbun/)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 A command-line tool for managing domains and DNS records through the [Porkbun API](https://porkbun.com/api/json/v3/documentation).
@@ -19,10 +19,10 @@ ID          Type  Name               Content         Prio  TTL
 ## Install
 
 ```bash
-pip install porkbun-cli
+pip install porkbun
 
 # With interactive menu support
-pip install porkbun-cli[interactive]
+pip install porkbun[interactive]
 ```
 
 ## Setup
