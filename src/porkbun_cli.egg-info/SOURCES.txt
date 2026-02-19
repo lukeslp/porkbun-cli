@@ -1,0 +1,15 @@
+LICENSE
+README.md
+pyproject.toml
+src/porkbun_cli/__init__.py
+src/porkbun_cli/__main__.py
+src/porkbun_cli/api.py
+src/porkbun_cli/cli.py
+src/porkbun_cli/interactive.py
+src/porkbun_cli/py.typed
+src/porkbun_cli.egg-info/PKG-INFO
+src/porkbun_cli.egg-info/SOURCES.txt
+src/porkbun_cli.egg-info/dependency_links.txt
+src/porkbun_cli.egg-info/entry_points.txt
+src/porkbun_cli.egg-info/requires.txt
+src/porkbun_cli.egg-info/top_level.txt

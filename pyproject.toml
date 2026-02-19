@@ -9,10 +9,17 @@ description = "Command-line interface for managing domains and DNS records throu
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
+<<<<<<< HEAD
     {name = "Luke Steuber", email = "luke@dr.eamer.dev"}
 ]
 maintainers = [
     {name = "Luke Steuber", email = "luke@dr.eamer.dev"}
+=======
+    {name = "Luke Steuber", email = "luke@lukesteuber.com"}
+]
+maintainers = [
+    {name = "Luke Steuber", email = "luke@lukesteuber.com"}
+>>>>>>> origin/master
 ]
 keywords = ["porkbun", "dns", "domain", "cli", "api"]
 classifiers = [
