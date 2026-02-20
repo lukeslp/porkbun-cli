@@ -87,7 +87,7 @@ cd porkbun-cli
 pip install -r requirements.txt
 
 # Set up API credentials
-# Create ~/.porkbun_config with your API key and secret
+porkbun configure
 ```
 
 ### API Credentials
@@ -96,26 +96,23 @@ You'll need Porkbun API credentials for testing:
 1. Log in to your Porkbun account
 2. Go to API Access section
 3. Generate API key and secret
-4. Save them in `~/.porkbun_config`:
-   ```
-   api_key=your_api_key_here
-   api_secret=your_api_secret_here
-   ```
+4. Run `porkbun configure` and enter your credentials when prompted
+5. Credentials are stored in `~/.config/porkbun-cli/config.json`
 
 ## Command Structure
 
 The CLI follows this pattern:
 ```bash
-python porkbun.py <command> [arguments] [options]
+porkbun <group> <command> [arguments] [options]
 ```
 
 Commands:
-- `list` - List all domains
-- `view <domain>` - View domain details
-- `dns-list <domain>` - List DNS records
-- `dns-create <domain> <type> <content>` - Create DNS record
-- `dns-delete <domain> <id>` - Delete DNS record
-- `check <domain>` - Check domain availability
+- `porkbun domain list` - List all domains
+- `porkbun domain search <domain>` - Check domain availability
+- `porkbun dns list <domain>` - List DNS records
+- `porkbun dns create <domain> <type> <content>` - Create DNS record
+- `porkbun dns delete <domain> <id>` - Delete DNS record
+- `porkbun dns upsert <domain> <type> <content>` - Create or update DNS record
 
 ## Questions?
 
