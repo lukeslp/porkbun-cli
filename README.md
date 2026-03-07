@@ -181,4 +181,5 @@ MIT — see [LICENSE](LICENSE).
 
 ## Author
 
-[Luke Steuber](https://lukesteuber.com) · [GitHub](https://github.com/lukeslp/porkbun-cli) · [Bluesky](https://bsky.app/profile/lukesteuber.com)
+**Luke Steuber** · [lukesteuber.com](https://lukesteuber.com) · [@lukesteuber.com](https://bsky.app/profile/lukesteuber.com)
+
