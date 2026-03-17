@@ -916,11 +916,20 @@ def interactive_domains(api):
             if domain:
                 try:
                     res = api.domain_check(domain)
-                    pricing = res.get('pricing', {})
+                    info = res.get('response', {})
                     print(f"\nDomain: {domain}")
-                    if pricing:
-                        print(f"Registration: ${pricing.get('registration', 'N/A')}")
-                        print(f"Renewal: ${pricing.get('renewal', 'N/A')}")
+                    available = info.get('avail', 'unknown')
+                    if available == 'yes':
+                        print(f"Available: YES")
+                    else:
+                        print(f"Available: NO (already registered)")
+                    print(f"Registration: ${info.get('price', 'N/A')}")
+                    additional = info.get('additional', {})
+                    renewal = additional.get('renewal', {})
+                    print(f"Renewal: ${renewal.get('price', 'N/A')}")
+                    min_duration = info.get('minDuration')
+                    if min_duration and min_duration > 1:
+                        print(f"Minimum registration: {min_duration} years")
                     print()
                 except Exception as e:
                     print(f"\nError: {e}\n")
