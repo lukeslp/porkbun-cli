@@ -92,7 +92,7 @@ class PorkbunAPI:
 
     def domain_check(self, domain):
         """Check domain availability and pricing"""
-        return self._request(f"pricing/get/{domain}")
+        return self._request(f"domain/checkDomain/{domain}")
 
     def domain_create(self, domain, registration_type="personal", admin_filing_type="",
                       whois_privacy=False, auto_renew=False):
@@ -284,14 +284,24 @@ def cmd_domain_search(args):
     api = PorkbunAPI()
     try:
         res = api.domain_check(args.domain)
-        pricing = res.get('pricing', {})
+        info = res.get('response', {})
         print(f"Domain: {args.domain}")
-        if pricing:
-            print(f"Registration: ${pricing.get('registration', 'N/A')}")
-            print(f"Renewal: ${pricing.get('renewal', 'N/A')}")
-            print(f"Transfer: ${pricing.get('transfer', 'N/A')}")
+        available = info.get('avail', 'unknown')
+        if available == 'yes':
+            print(f"Available: YES")
         else:
-            print("Pricing information not available")
+            print(f"Available: NO (already registered)")
+        print(f"Registration: ${info.get('price', 'N/A')}")
+        additional = info.get('additional', {})
+        renewal = additional.get('renewal', {})
+        transfer = additional.get('transfer', {})
+        print(f"Renewal: ${renewal.get('price', 'N/A')}")
+        print(f"Transfer: ${transfer.get('price', 'N/A')}")
+        min_duration = info.get('minDuration')
+        if min_duration and min_duration > 1:
+            print(f"Minimum registration: {min_duration} years")
+        if info.get('premium') == 'yes':
+            print(f"Premium domain: YES")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
