@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "porkbun-cli"
-version = "1.0.0"
+name = "cli-porkbun"
+version = "1.0.1"
 description = "Command-line interface for managing domains and DNS records through the Porkbun API"
 readme = "README.md"
 license = {text = "MIT"}
@@ -49,17 +49,17 @@ dev = [
     "ruff>=0.1.0",
 ]
 all = [
-    "porkbun-cli[interactive,dev]",
+    "cli-porkbun[interactive,dev]",
 ]
 
 [project.scripts]
 porkbun = "porkbun_cli.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/lukeslp/porkbun-cli"
-Documentation = "https://github.com/lukeslp/porkbun-cli#readme"
-Repository = "https://github.com/lukeslp/porkbun-cli.git"
-Issues = "https://github.com/lukeslp/porkbun-cli/issues"
+Homepage = "https://github.com/lukeslp/cli-porkbun"
+Documentation = "https://github.com/lukeslp/cli-porkbun#readme"
+Repository = "https://github.com/lukeslp/cli-porkbun.git"
+Issues = "https://github.com/lukeslp/cli-porkbun/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

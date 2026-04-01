@@ -54,13 +54,21 @@ class PorkbunAPI:
 
         try:
             response = requests.post(url, json=payload)
-            response.raise_for_status()
-            result = response.json()
+            # Try to parse JSON even on error responses
+            try:
+                result = response.json()
+            except ValueError:
+                response.raise_for_status()
+                raise Exception(f"Non-JSON response from {endpoint}")
+
             if result.get('status') == 'ERROR':
-                raise Exception(f"Porkbun API Error: {result.get('message')}")
+                raise Exception(result.get('message', 'Unknown API error'))
+
             return result
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"Network error: {e}")
+        except requests.exceptions.ConnectionError as e:
+            raise Exception(f"Connection error: {e}")
+        except requests.exceptions.Timeout as e:
+            raise Exception(f"Request timed out: {e}")
 
     def ping(self):
         return self._request("ping")
@@ -70,18 +78,76 @@ class PorkbunAPI:
         """List all domains in account"""
         return self._request("domain/listAll")
 
-    def domain_check(self, domain):
-        """Check domain availability and pricing"""
-        return self._request(f"pricing/get/{domain}")
+    def pricing_get(self, tld=None):
+        """Get pricing for all TLDs or a specific TLD.
+        Returns dict of TLD -> {registration, renewal, transfer, coupons}
+        """
+        result = self._request("pricing/get")
+        pricing = result.get('pricing', {})
+        if tld:
+            tld = tld.lstrip('.')
+            return pricing.get(tld)
+        return pricing
 
-    def domain_create(self, domain, registration_type="personal", admin_filing_type="",
-                      whois_privacy=False, auto_renew=False):
-        """Register a new domain"""
+    def domain_check(self, domain):
+        """Check domain availability via WHOIS and pricing lookup.
+        Returns dict with 'available' bool and 'pricing' if available.
+        """
+        import subprocess
+        tld = domain.split('.', 1)[1] if '.' in domain else domain
+
+        # Get pricing for this TLD
+        pricing = self.pricing_get(tld)
+
+        # Check availability via whois
+        available = None
+        try:
+            result = subprocess.run(
+                ['whois', domain], capture_output=True, text=True, timeout=10
+            )
+            output = result.stdout.lower()
+            if any(s in output for s in ['no match', 'not found', 'no object', 'domain not found', 'no entries']):
+                available = True
+            elif result.stdout.strip():
+                available = False
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            pass
+
+        # For .app/.dev and others where whois is unreliable, try RDAP
+        if available is None:
+            try:
+                import requests as req
+                resp = req.get(f"https://rdap.org/domain/{domain}", timeout=5)
+                if resp.status_code == 404:
+                    available = True
+                elif resp.status_code == 200:
+                    available = False
+            except Exception:
+                pass
+
+        return {
+            'domain': domain,
+            'available': available,
+            'pricing': pricing,
+        }
+
+    def domain_create(self, domain, whois_privacy=True, auto_renew=True, years=1):
+        """Register a new domain. Automatically looks up cost."""
+        tld = domain.split('.', 1)[1] if '.' in domain else domain
+        pricing = self.pricing_get(tld)
+        if not pricing:
+            raise Exception(f"TLD .{tld} not available on Porkbun")
+
+        # Cost is in pennies (integer), pricing is dollars (string)
+        cost_dollars = float(pricing['registration']) * years
+        cost_pennies = int(round(cost_dollars * 100))
+
         data = {
-            "registrationType": registration_type,
-            "adminFilingType": admin_filing_type,
             "whoisPrivacy": "yes" if whois_privacy else "no",
-            "autoRenew": "yes" if auto_renew else "no"
+            "autoRenew": "yes" if auto_renew else "no",
+            "years": years,
+            "cost": cost_pennies,
+            "agreeToTerms": "yes",
         }
         return self._request(f"domain/create/{domain}", data)
 

@@ -82,14 +82,23 @@ def cmd_domain_search(args):
     api = PorkbunAPI()
     try:
         res = api.domain_check(args.domain)
-        pricing = res.get('pricing', {})
-        print(f"Domain: {args.domain}")
+        available = res.get('available')
+        pricing = res.get('pricing')
+
+        status = "AVAILABLE" if available else "TAKEN" if available is False else "UNKNOWN"
+        print(f"{args.domain}  {status}")
+
         if pricing:
-            print(f"Registration: ${pricing.get('registration', 'N/A')}")
-            print(f"Renewal: ${pricing.get('renewal', 'N/A')}")
-            print(f"Transfer: ${pricing.get('transfer', 'N/A')}")
+            print(f"  Register: ${pricing.get('registration', '?')}")
+            print(f"  Renewal:  ${pricing.get('renewal', '?')}")
+            print(f"  Transfer: ${pricing.get('transfer', '?')}")
+            coupons = pricing.get('coupons', [])
+            if coupons:
+                for c in coupons:
+                    print(f"  Coupon:   {c}")
         else:
-            print("Pricing information not available")
+            tld = args.domain.split('.', 1)[1] if '.' in args.domain else args.domain
+            print(f"  TLD .{tld} not available on Porkbun")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
@@ -98,18 +107,49 @@ def cmd_domain_search(args):
 def cmd_domain_buy(args):
     """Purchase a domain"""
     api = PorkbunAPI()
-    print(f"PREPARING TO BUY DOMAIN: {args.domain}")
-    print("This will charge your account.")
-    confirm = input("Are you sure? Type 'YES' to confirm: ")
-    if confirm != 'YES':
-        print("Aborted.")
-        sys.exit(0)
+
+    # Look up pricing first
+    try:
+        tld = args.domain.split('.', 1)[1] if '.' in args.domain else args.domain
+        pricing = api.pricing_get(tld)
+        if not pricing:
+            print(f"Error: TLD .{tld} not available on Porkbun", file=sys.stderr)
+            sys.exit(1)
+        reg_price = pricing.get('registration', '?')
+    except Exception as e:
+        print(f"Error looking up pricing: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    # Check availability before showing purchase prompt
+    check = api.domain_check(args.domain)
+    if check.get('available') is False:
+        print(f"{args.domain} is not available.", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Domain:  {args.domain}")
+    print(f"Cost:    ${reg_price}")
+    print(f"Privacy: WHOIS privacy enabled")
+    print(f"Renew:   Auto-renew enabled")
+    if check.get('available') is None:
+        print(f"Note:    Availability could not be confirmed (WHOIS/RDAP inconclusive)")
+
+    if not args.yes:
+        try:
+            confirm = input("\nType 'YES' to confirm purchase: ")
+            if confirm != 'YES':
+                print("Aborted.")
+                sys.exit(0)
+        except EOFError:
+            print("\nError: Cannot confirm interactively. Use --yes to skip confirmation.", file=sys.stderr)
+            sys.exit(1)
 
     try:
         res = api.domain_create(args.domain, whois_privacy=True, auto_renew=True)
-        print(f"Success! Domain registered.")
-        if res.get('invoiceId'):
-            print(f"Invoice ID: {res.get('invoiceId')}")
+        print(f"\nRegistered {args.domain}")
+        if res.get('domain'):
+            print(f"Domain: {res.get('domain')}")
+        if res.get('orderId'):
+            print(f"Order:  {res.get('orderId')}")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
@@ -478,6 +518,7 @@ Examples:
 
     buy_p = domain_sub.add_parser('buy', help='Purchase a domain')
     buy_p.add_argument('domain', help='Domain name')
+    buy_p.add_argument('-y', '--yes', action='store_true', help='Skip confirmation prompt')
 
     ns_p = domain_sub.add_parser('ns', help='Get nameservers')
     ns_p.add_argument('domain', help='Domain name')
