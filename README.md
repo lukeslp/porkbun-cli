@@ -128,12 +128,4 @@ MIT License - see [LICENSE](LICENSE) file
 
 ## Author
 
-<<<<<<< Updated upstream
 **Luke Steuber** · [lukesteuber.com](https://lukesteuber.com) · [@lukesteuber.com](https://bsky.app/profile/lukesteuber.com)
-
-=======
-**Luke Steuber**
-
-- Website: [dr.eamer.dev](https://dr.eamer.dev)
-- Bluesky: [@dr.eamer.dev](https://bsky.app/profile/dr.eamer.dev)
->>>>>>> Stashed changes
